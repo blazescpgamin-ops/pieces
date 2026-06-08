@@ -1,0 +1,1639 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Product Detail — Pieces Furniture In Steel</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700&family=Barlow:wght@300;400;500&family=Cormorant+Garamond:ital,wght@0,300;1,300&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --bg:     #060d1a;
+  --s1:     #0d1a2e;
+  --s2:     #162034;
+  --border: rgba(45,140,255,.18);
+  --blue:   #2d8cff;
+  --blue2:  #4da3ff;
+  --cyan:   #00c8ff;
+  --silver: #7a90aa;
+  --light:  #d6e4f7;
+  --white:  #f0f7ff;
+  --red:    #e63946;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--light);font-family:'Barlow',sans-serif;font-weight:300;min-height:100vh}
+a{text-decoration:none}
+button{cursor:pointer;font-family:inherit}
+
+/* ── NAV ── */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:.8rem 2.5rem;
+  background:rgba(6,13,26,.96);backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--border);
+}
+.nav-brand{display:flex;align-items:center;gap:.75rem}
+.nav-logo{width:36px;height:36px;border-radius:9px;overflow:hidden;flex-shrink:0}
+.nav-logo img{width:100%;height:100%;object-fit:cover;display:block}
+.nav-name{font-family:'Barlow Condensed',sans-serif;font-size:1.1rem;font-weight:700;letter-spacing:.06em;color:var(--white);line-height:1}
+.nav-sub{font-size:.6rem;color:var(--silver);letter-spacing:.14em;margin-top:2px}
+.nav-back{
+  display:flex;align-items:center;gap:.5rem;
+  font-family:'Barlow Condensed',sans-serif;font-size:.8rem;
+  font-weight:600;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--blue2);transition:color .2s;
+}
+.nav-back:hover{color:var(--cyan)}
+
+/* ── PAGE LAYOUT ── */
+.page{
+  max-width:1200px;margin:0 auto;
+  padding:5.5rem 2.5rem 4rem;
+  display:grid;grid-template-columns:1fr 1fr;
+  gap:3rem;align-items:start;
+}
+
+/* ── 3D VIEWER ── */
+.viewer-wrap{
+  position:sticky;top:5.5rem;
+  display:flex;flex-direction:column;gap:1rem;
+}
+.viewer-box{
+  width:100%;aspect-ratio:1/1;
+  background:#0d1b2a;
+  border:1px solid var(--border);border-radius:16px;
+  position:relative;overflow:hidden;
+  cursor:grab;
+  box-shadow:0 0 40px rgba(0,100,200,.12);
+}
+.viewer-box:active{cursor:grabbing}
+canvas#viewer3d{width:100%;height:100%;display:block;border-radius:16px}
+
+/* Corner accents */
+.viewer-box::before,.viewer-box::after{
+  content:'';position:absolute;z-index:2;
+  width:20px;height:20px;pointer-events:none;
+}
+.viewer-box::before{
+  top:12px;left:12px;
+  border-top:2px solid var(--cyan);border-left:2px solid var(--cyan);
+  border-radius:3px 0 0 0;opacity:.6;
+}
+.viewer-box::after{
+  bottom:12px;right:12px;
+  border-bottom:2px solid var(--cyan);border-right:2px solid var(--cyan);
+  border-radius:0 0 3px 0;opacity:.6;
+}
+
+/* Viewer controls */
+.viewer-controls{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:.7rem 1rem;
+  background:var(--s1);border:1px solid var(--border);border-radius:10px;
+}
+.viewer-hint{
+  font-family:'Barlow Condensed',sans-serif;font-size:.72rem;
+  letter-spacing:.12em;color:var(--silver);
+  display:flex;align-items:center;gap:.5rem;
+}
+.viewer-btns{display:flex;gap:.4rem}
+.vbtn{
+  width:32px;height:32px;border-radius:7px;
+  background:rgba(45,140,255,.1);border:1px solid rgba(45,140,255,.25);
+  color:var(--blue2);display:flex;align-items:center;justify-content:center;
+  transition:background .2s;font-size:.8rem;
+}
+.vbtn:hover{background:rgba(45,140,255,.25)}
+.color3d-btn.active{ transform:scale(1.25) !important; border-color:#fff !important; }
+
+/* Photo thumbnails — bottom-left of viewer */
+.viewer-photos {
+  position: absolute; bottom: 10px; left: 10px;
+  display: flex; flex-direction: column; gap: 6px;
+  z-index: 5;
+}
+.viewer-thumb {
+  width: 52px; height: 52px; border-radius: 8px;
+  object-fit: cover; cursor: pointer;
+  border: 2px solid rgba(255,255,255,.2);
+  transition: border-color .2s, transform .2s;
+  box-shadow: 0 2px 8px rgba(0,0,0,.5);
+}
+.viewer-thumb:hover { border-color: #fff; transform: scale(1.08); }
+
+/* Lightbox */
+.photo-lightbox {
+  display: none; position: absolute; inset: 0;
+  background: rgba(0,0,0,.88); z-index: 20;
+  align-items: center; justify-content: center;
+  border-radius: 16px;
+}
+.photo-lightbox.open { display: flex; }
+.photo-lightbox img {
+  max-width: 90%; max-height: 90%;
+  border-radius: 10px; object-fit: contain;
+}
+.lightbox-close {
+  position: absolute; top: 12px; right: 12px;
+  width: 32px; height: 32px; border-radius: 50%;
+  background: rgba(255,255,255,.15); border: none;
+  color: #fff; font-size: 1rem; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+}
+
+/* Spin badge */
+.spin-toggle{
+  display:flex;align-items:center;gap:.4rem;
+  font-family:'Barlow Condensed',sans-serif;font-size:.72rem;
+  letter-spacing:.1em;color:var(--silver);cursor:pointer;
+  background:none;border:none;
+}
+.spin-dot{
+  width:8px;height:8px;border-radius:50%;
+  background:var(--cyan);
+  box-shadow:0 0 8px var(--cyan);
+  transition:background .2s;
+}
+.spin-toggle.off .spin-dot{background:var(--silver);box-shadow:none}
+
+/* Loading overlay */
+.viewer-loading{
+  position:absolute;inset:0;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:1rem;z-index:10;
+  background:linear-gradient(135deg,#000810,#04080f);
+  border-radius:16px;
+  transition:opacity .5s;
+}
+.viewer-loading.done{opacity:0;pointer-events:none}
+.loader-ring{
+  width:48px;height:48px;border-radius:50%;
+  border:3px solid rgba(0,200,255,.15);
+  border-top-color:var(--cyan);
+  animation:spin 1s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loader-text{
+  font-family:'Barlow Condensed',sans-serif;font-size:.75rem;
+  letter-spacing:.2em;text-transform:uppercase;color:var(--cyan);opacity:.7;
+}
+
+/* ── PRODUCT INFO ── */
+.product-info{display:flex;flex-direction:column;gap:1.4rem}
+
+.product-tag{
+  font-family:'Barlow Condensed',sans-serif;font-size:.68rem;
+  letter-spacing:.3em;text-transform:uppercase;color:var(--blue);
+}
+.product-name{
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(2rem,4vw,3.2rem);font-weight:300;
+  color:var(--white);line-height:1.05;
+}
+.product-name em{font-style:italic;color:var(--cyan)}
+
+.product-price-row{display:flex;align-items:baseline;gap:.8rem}
+.product-price{
+  font-family:'Barlow Condensed',sans-serif;font-size:2rem;
+  font-weight:700;color:var(--blue2);
+}
+.product-price-orig{
+  font-size:1.1rem;color:var(--silver);text-decoration:line-through;
+}
+.product-sale-badge{
+  background:var(--red);color:#fff;
+  font-family:'Barlow Condensed',sans-serif;font-size:.72rem;
+  font-weight:700;padding:.2rem .55rem;border-radius:4px;
+}
+
+/* Description */
+.product-desc{
+  font-size:.9rem;line-height:1.75;color:var(--silver);
+  border-left:2px solid rgba(45,140,255,.3);padding-left:1rem;
+}
+
+/* Specs table */
+.specs-title{
+  font-family:'Barlow Condensed',sans-serif;font-size:.72rem;
+  letter-spacing:.25em;text-transform:uppercase;color:var(--blue);
+  margin-bottom:.8rem;
+}
+.specs-table{width:100%;border-collapse:collapse}
+.specs-table tr{border-bottom:1px solid rgba(45,140,255,.08)}
+.specs-table tr:last-child{border-bottom:none}
+.specs-table td{padding:.65rem 0;font-size:.86rem;vertical-align:top}
+.specs-table td:first-child{color:var(--silver);width:40%;}
+.specs-table td:last-child{color:var(--light);font-weight:400}
+
+/* Order form */
+.order-divider{
+  height:1px;background:var(--border);margin:.5rem 0;
+}
+.order-title{
+  font-family:'Barlow Condensed',sans-serif;font-size:.72rem;
+  letter-spacing:.25em;text-transform:uppercase;color:var(--blue);
+  margin-bottom:.8rem;
+}
+.order-row{display:grid;grid-template-columns:1fr 1fr;gap:.7rem}
+.of{margin-bottom:.8rem}
+.of label{
+  display:block;font-family:'Barlow Condensed',sans-serif;
+  font-size:.66rem;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--silver);margin-bottom:.35rem;
+}
+.fi{
+  width:100%;padding:.58rem .88rem;
+  background:rgba(45,140,255,.07);border:1px solid rgba(45,140,255,.2);
+  border-radius:8px;color:var(--light);
+  font-family:'Barlow',sans-serif;font-size:.86rem;outline:none;
+  transition:border-color .2s;
+}
+.fi:focus{border-color:var(--blue)}
+.fi::placeholder{color:var(--silver)}
+
+/* Color swatches */
+.swatches{display:flex;gap:.55rem;flex-wrap:wrap;margin-top:.3rem}
+.sw{
+  width:30px;height:30px;border-radius:50%;cursor:pointer;
+  border:2px solid transparent;transition:transform .15s,border-color .15s;
+  position:relative;
+}
+.sw:hover{transform:scale(1.12)}
+.sw.on{border-color:#fff;transform:scale(1.2)}
+.sw::after{
+  content:attr(data-label);position:absolute;bottom:-17px;
+  left:50%;transform:translateX(-50%);
+  font-size:.56rem;color:var(--silver);white-space:nowrap;
+}
+
+/* Buttons */
+.btn-order{
+  display:flex;align-items:center;justify-content:center;gap:.5rem;
+  width:100%;padding:.85rem;border:none;border-radius:10px;
+  font-family:'Barlow Condensed',sans-serif;font-size:.95rem;
+  font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+  transition:background .2s,transform .15s;color:#fff;
+}
+.btn-order:hover{transform:translateY(-2px)}
+.btn-confirm{background:var(--blue)}
+.btn-confirm:hover{background:#1a6fd4}
+.btn-addcart{background:var(--blue);margin-top:.8rem}
+.btn-addcart:hover{background:#1a6fd4}
+.btn-messenger{background:#0084ff;margin-top:.5rem}
+.btn-messenger:hover{background:#006ecc}
+.btn-telegram{background:#26a5e4;margin-top:.5rem}
+.btn-telegram:hover{background:#1a90cc}
+.qty-row{display:flex;align-items:center;gap:.5rem}
+.qty-btn{width:36px;height:36px;border-radius:8px;background:rgba(45,140,255,.12);border:1px solid rgba(45,140,255,.25);color:var(--blue2);font-size:1.1rem;cursor:pointer;transition:background .2s}
+.qty-btn:hover{background:rgba(45,140,255,.28)}
+.qty-input{width:60px;text-align:center;padding:.5rem}
+
+/* Related products */
+.related-section{
+  max-width:1200px;margin:0 auto;
+  padding:0 2.5rem 4rem;
+}
+.related-title{
+  font-family:'Cormorant Garamond',serif;font-size:1.8rem;font-weight:300;
+  color:var(--white);margin-bottom:1.5rem;
+}
+.related-title em{font-style:italic;color:var(--cyan)}
+.related-grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));
+  gap:3px;
+}
+.related-card{
+  background:var(--s1);overflow:hidden;cursor:pointer;
+  transition:background .2s;
+}
+.related-card:hover{background:var(--s2)}
+.related-img{width:100%;aspect-ratio:1/1;overflow:hidden;background:var(--s2)}
+.related-img img{width:100%;height:100%;object-fit:cover;transition:transform .4s}
+.related-card:hover .related-img img{transform:scale(1.06)}
+.related-info{padding:.75rem .9rem}
+.related-code{font-family:'Barlow Condensed',sans-serif;font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;color:var(--blue);margin-bottom:.2rem}
+.related-name{font-family:'Cormorant Garamond',serif;font-size:.95rem;color:var(--white);margin-bottom:.3rem}
+.related-price{font-family:'Barlow Condensed',sans-serif;font-size:.9rem;font-weight:700;color:var(--blue2)}
+
+/* No-img placeholder */
+.no-img{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.4rem;color:var(--silver);font-size:.7rem}
+
+/* Toast */
+.toast{
+  position:fixed;bottom:2rem;left:50%;transform:translateX(-50%) translateY(20px);
+  z-index:999;background:var(--s2);border:1px solid var(--border);
+  border-radius:10px;padding:.9rem 1.6rem;
+  font-family:'Barlow Condensed',sans-serif;font-size:.9rem;font-weight:600;color:var(--white);
+  opacity:0;transition:opacity .3s,transform .3s;pointer-events:none;
+  white-space:nowrap;
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* Responsive */
+@media(max-width:768px){
+  nav{padding:.7rem 1rem}
+  .page{grid-template-columns:1fr;padding:5rem 1rem 3rem;gap:2rem}
+  .viewer-wrap{position:static}
+  .related-section{padding:0 1rem 3rem}
+  .order-row{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-brand">
+    <div class="nav-logo"><img src="data:image/jpeg;base64,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mvVjlqSAEi4oAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD//2Q==" alt="Pieces Logo"/></div>
+    <div>
+      <div class="nav-name">Pieces</div>
+      <div class="nav-sub">Furniture In Steel</div>
+    </div>
+  </div>
+  <a href="javascript:void(0)" onclick="window.location.replace('index.html?v='+Date.now())" class="nav-back">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+    Back to Shop
+  </a>
+</nav>
+
+<!-- Floating cart bubble — bottom right like chat button -->
+<button onclick="openCart()" style="
+  position:fixed; bottom:1.6rem; right:1.4rem; z-index:450;
+  width:56px; height:56px; border-radius:50%;
+  background:linear-gradient(135deg,#1a6fd4,#2d8cff);
+  border:none; cursor:pointer; box-shadow:0 4px 20px rgba(45,140,255,.5);
+  display:flex; align-items:center; justify-content:center;
+  transition:transform .2s, box-shadow .2s;
+  " onmouseover="this.style.transform='scale(1.1)';this.style.boxShadow='0 6px 28px rgba(45,140,255,.7)'"
+     onmouseout="this.style.transform='scale(1)';this.style.boxShadow='0 4px 20px rgba(45,140,255,.5)'">
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2">
+    <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
+    <path d="M1 1h4l2.68 13.39a2 2 0 001.99 1.61H19a2 2 0 001.99-1.77l.97-8.84H6"/>
+  </svg>
+  <span id="cart-badge" style="
+    position:absolute; top:-4px; right:-4px;
+    background:#e53; color:#fff; font-size:.6rem; font-weight:700;
+    border-radius:50%; width:20px; height:20px;
+    display:none; align-items:center; justify-content:center;
+    border:2px solid #0d1b2a;
+  ">0</span>
+</button>
+
+<!-- Cart veil -->
+<div id="cart-veil" onclick="closeCart()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:400"></div>
+
+<!-- Cart drawer -->
+<div id="cart-drawer" style="position:fixed;top:0;right:-420px;width:380px;max-width:100vw;height:100vh;background:#0d1b2a;border-left:1px solid rgba(45,140,255,.2);z-index:500;display:flex;flex-direction:column;transition:right .3s;overflow:hidden">
+
+  <!-- Header -->
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:1.1rem 1.2rem;border-bottom:1px solid rgba(45,140,255,.15)">
+    <div style="display:flex;align-items:center;gap:.5rem;font-family:'Barlow Condensed',sans-serif;font-size:1rem;font-weight:700;color:#f0f4ff">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 001.99 1.61H19a2 2 0 001.99-1.77l.97-8.84H6"/></svg>
+      My Cart
+    </div>
+    <button onclick="closeCart()" style="background:none;border:none;color:#7a8fa6;font-size:1.1rem;cursor:pointer">✕</button>
+  </div>
+
+  <!-- Items list -->
+  <div id="cart-bd" style="flex:1;overflow-y:auto;padding:1rem 1.2rem"></div>
+
+  <!-- Footer with form + buttons -->
+  <div id="cart-ft" style="display:none;flex-direction:column;gap:.6rem;padding:1rem 1.2rem;border-top:1px solid rgba(45,140,255,.15)">
+    <div style="display:flex;justify-content:space-between;font-family:'Barlow Condensed',sans-serif;font-size:.78rem;color:#7a8fa6">
+      <span id="cart-total"></span>
+      <span id="cart-grand-total" style="font-size:1rem;font-weight:700;color:#7ec8ff"></span>
+    </div>
+    <input type="text" id="cust-name"     placeholder="Your Name *"              style="width:100%;padding:.55rem .8rem;background:rgba(45,140,255,.07);border:1px solid rgba(45,140,255,.2);border-radius:8px;color:#f0f4ff;font-size:.85rem;outline:none;box-sizing:border-box"/>
+    <input type="tel"  id="cust-phone"    placeholder="Phone Number *"           style="width:100%;padding:.55rem .8rem;background:rgba(45,140,255,.07);border:1px solid rgba(45,140,255,.2);border-radius:8px;color:#f0f4ff;font-size:.85rem;outline:none;box-sizing:border-box"/>
+    <input type="text" id="cust-location" placeholder="📍 Your Location / Address" style="width:100%;padding:.55rem .8rem;background:rgba(45,140,255,.07);border:1px solid rgba(45,140,255,.2);border-radius:8px;color:#f0f4ff;font-size:.85rem;outline:none;box-sizing:border-box"/>
+    <button onclick="sendViaMessenger()" style="width:100%;padding:.72rem;background:#0084ff;border:none;border-radius:8px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:.9rem;font-weight:700;letter-spacing:.1em;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:.5rem">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.145 2 11.243c0 2.861 1.408 5.415 3.618 7.1V21l3.313-1.814A11.16 11.16 0 0012 19.487c5.523 0 10-4.145 10-9.244C22 6.145 17.523 2 12 2z"/></svg>
+      Send via Messenger
+    </button>
+    <button onclick="sendViaTelegram()" style="width:100%;padding:.72rem;background:#26a5e4;border:none;border-radius:8px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:.9rem;font-weight:700;letter-spacing:.1em;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:.5rem">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8l-1.7 8c-.12.59-.46.74-.93.46l-2.57-1.9-1.24 1.19c-.14.14-.25.25-.51.25l.18-2.6 4.7-4.24c.2-.18-.04-.28-.32-.1L7.84 14.6l-2.52-.79c-.55-.17-.56-.55.11-.81l9.85-3.8c.46-.17.86.11.36.6z"/></svg>
+      Send via Telegram
+    </button>
+    <button onclick="clearCart()" style="width:100%;padding:.5rem;background:none;border:1px solid rgba(255,255,255,.1);border-radius:8px;color:#7a8fa6;font-size:.8rem;cursor:pointer">Clear Cart</button>
+  </div>
+</div>
+
+<div class="page">
+
+  <!-- ── LEFT: 3D VIEWER ── -->
+  <div class="viewer-wrap">
+    <div class="viewer-box">
+      <!-- Loading state -->
+      <div class="viewer-loading" id="viewer-loading">
+        <div class="loader-ring"></div>
+        <div class="loader-text">Loading 3D Model…</div>
+      </div>
+      <canvas id="viewer3d"></canvas>
+
+      <!-- Photo thumbnails — bottom-left corner of viewer -->
+      <div class="viewer-photos" id="viewer-photos"></div>
+
+      <!-- Fullscreen lightbox -->
+      <div class="photo-lightbox" id="photo-lightbox" onclick="closeLightbox()">
+        <img id="lightbox-img" src="" alt="Product photo"/>
+        <button class="lightbox-close" onclick="closeLightbox()">✕</button>
+      </div>
+    </div>
+
+    <!-- Controls bar -->
+    <div class="viewer-controls">
+      <div class="viewer-hint">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 11V6a2 2 0 00-2-2v0a2 2 0 00-2 2v0M14 10V4a2 2 0 00-2-2v0a2 2 0 00-2 2v0M10 10.5V6a2 2 0 00-2-2v0a2 2 0 00-2 2v4"/><path d="M18 11a2 2 0 114 0v3a8 8 0 01-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 012.83-2.82L7 15"/></svg>
+        Drag · Scroll to zoom
+      </div>
+      <div style="display:flex;align-items:center;gap:.6rem">
+        <!-- 3D Color buttons -->
+        <button class="color3d-btn active" data-color="Black" onclick="set3DColor('Black')" title="Black" style="width:22px;height:22px;border-radius:50%;background:#1a1a1a;border:2px solid #fff;cursor:pointer;transition:transform .15s"></button>
+        <button class="color3d-btn" data-color="White" onclick="set3DColor('White')" title="White" style="width:22px;height:22px;border-radius:50%;background:#f0f0f0;border:2px solid transparent;cursor:pointer;transition:transform .15s"></button>
+        <button class="color3d-btn" data-color="Gold" onclick="set3DColor('Gold')" title="Gold +2,500 Ks" style="width:22px;height:22px;border-radius:50%;background:#c9a84c;border:2px solid transparent;cursor:pointer;transition:transform .15s"></button>
+        <button class="vbtn" onclick="resetCamera()" title="Reset view">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 109-9 9.75 9.75 0 00-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+        </button>
+        <button class="spin-toggle" id="spin-toggle" onclick="toggleSpin()">
+          <div class="spin-dot"></div>
+          Auto-spin
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── RIGHT: PRODUCT INFO ── -->
+  <div class="product-info" id="product-info">
+    <!-- Filled by JS -->
+  </div>
+</div>
+
+<!-- Related products -->
+<div class="related-section">
+  <div class="related-title">Related <em>Products</em></div>
+  <div class="related-grid" id="related-grid"></div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============================================================
+   PRODUCTS — same array as index.html
+   Add products here to match your main shop
+============================================================ */
+/* Load from admin localStorage, or use defaults */
+const DEFAULT_PRODUCTS = [
+  {
+    code:'PFS 544', name:'Gold Display Rack',
+    price:'640,000 Ks', image:'/images/pfs544.jpg',
+    dims:'96 × 60 × 16 လက်မ', sale:true, salePrice:'512,000 Ks', discount:'20% Off',
+    description:'Premium steel display rack finished in gold powder coat. Perfect for boutiques, showrooms, and retail spaces. Custom sizes available on request.',
+    material:'Steel · Powder Coat Finish',
+    weight:'Approx. 25 kg',
+    assembly:'Fully assembled',
+    model:'PFS_001_KHON.obj',
+  },
+  {
+    code:'PFS 578', name:'Gold Clothes Rack',
+    price:'630,000 Ks', image:'/images/pfs578.jpg',
+    dims:'84 × 60 × 16 လက်မ', sale:true, salePrice:'504,000 Ks', discount:'20% Off',
+    description:'Elegant gold steel clothes rack with cross-bar design. Ideal for clothing stores and fashion boutiques.',
+    material:'Steel · Powder Coat Finish',
+    weight:'Approx. 20 kg',
+    assembly:'Fully assembled',
+    model:'',
+  },
+  {
+    code:'PFS 573', name:'Arched Hanger Stand',
+    price:'240,000 Ks', image:'/images/pfs573.jpg',
+    dims:'60 × 24 × 16 လက်မ', sale:true, salePrice:'192,000 Ks', discount:'20% Off',
+    description:'Classic arched single hanger stand. Decorative finial detail on top. Great for entrances and small spaces.',
+    material:'Steel · Powder Coat Finish',
+    weight:'Approx. 8 kg',
+    assembly:'Fully assembled',
+    model:'',
+  },
+  { code:'L528', name:'Wall Display Shelf System', price:'890,000 Ks', image:'/images/l528.jpg', dims:"L 4′ · H 8′ · W 16″", description:'Heavy-duty wall display shelf system. Six shelf levels. Perfect for large retail displays.', material:'Steel · Powder Coat Finish', weight:'Approx. 45 kg', assembly:'Requires wall mounting', model:'' },
+  { code:'L524', name:'6-Bay Display Rack',       price:'770,000 Ks', image:'/images/l524.jpg', dims:'6 ပေ · အမြင့် ၉ ပေ',       description:'Wide 6-bay display rack for maximum product visibility. Freestanding design.',                       material:'Steel · Powder Coat Finish', weight:'Approx. 38 kg', assembly:'Fully assembled',   model:'' },
+  { code:'L525', name:'4-Bay Glass Shelf',        price:'620,000 Ks', image:'/images/l525.jpg', dims:'4 ပေ · အမြင့် ၆ ပေ',       description:'Sleek 4-bay shelf unit with tempered glass option. Modern and minimal look.',                     material:'Steel · Powder Coat Finish', weight:'Approx. 28 kg', assembly:'Fully assembled',   model:'' },
+  { code:'L529', name:'Storage Shelf Unit',       price:'290,000 Ks', image:'/images/l529.jpg', dims:'4 ပေ · ၇ ပေ · နှစ်ဆင့်', description:'Compact two-tier storage shelf. Great for back-of-store or home use.',                            material:'Steel · Powder Coat Finish', weight:'Approx. 15 kg', assembly:'Fully assembled',   model:'' },
+  { code:'L530', name:'Clothes Hanging Rack',     price:'560,000 Ks', image:'/images/l530.jpg', dims:'4 ပေ · အမြင့် ၈ ပေ',       description:'Tall clothes hanging rack for boutiques. Two hanging rails for maximum capacity.',               material:'Steel · Powder Coat Finish', weight:'Approx. 22 kg', assembly:'Fully assembled',   model:'' },
+  { code:'L531', name:'7-Level Display Tower',    price:'680,000 Ks', image:'/images/l531.jpg', dims:'7 ပေ · အမြင့် ၇ ပေ',       description:'Seven-level display tower with adjustable shelf heights. Maximise vertical retail space.',         material:'Steel · Powder Coat Finish', weight:'Approx. 35 kg', assembly:'Fully assembled',   model:'' },
+];
+
+const _saved = localStorage.getItem('pieces_products_admin');
+if (!_saved) {
+  localStorage.setItem('pieces_products_admin', JSON.stringify(DEFAULT_PRODUCTS));
+}
+const PRODUCTS = _saved ? JSON.parse(_saved) : DEFAULT_PRODUCTS;
+
+/* ============================================================
+   EMBEDDED OBJ DATA — PFS 001
+============================================================ */
+const OBJ_DATA = {
+  'PFS_001_KHON.obj': `# Alias OBJ Model File
+# Exported from SketchUp, (c) 2000-2012 Trimble Navigation Limited
+# File units = inches
+
+mtllib PFS_001_KHON.mtl
+
+g Mesh1 Group2 Group1 Model
+
+usemtl Steel_Brushed_Stainless
+v 7 55.625 -1
+vt 0 0.0166667
+vn 0 0 1
+v 7 54.625 -1
+vt 0 0
+v 15 54.625 -1
+vt 0.133333 0
+v 15 55.625 -1
+vt 0.133333 0.0166667
+f 1/1/1 2/2/1 3/3/1 4/4/1 
+
+vn -0.707107 0 -0.707107
+v 8 55.625 -2
+vt -0.0235702 0.0166667
+v 8 54.625 -2
+vt -0.0235702 0
+f 1/1/2 5/5/2 6/6/2 2/2/2 
+
+v 14 55.625 -2
+vt 0.116667 0.0166667
+vn 0 1 -0
+vt 0.0166667 0.0166667
+f 7/7/3 5/8/3 1/2/3 4/3/3 
+
+v 14 54.625 -2
+vt -0.116667 0
+vn 0 0 -1
+vt -0.0166667 0
+vt -0.0166667 0.0166667
+vt -0.116667 0.0166667
+f 8/9/4 6/10/4 5/11/4 7/12/4 
+
+vt -0.133333 0
+vn 0 -1 -0
+f 3/13/5 2/2/5 6/11/5 8/12/5 
+
+vt -0.0707107 0.0166667
+vn 0.707107 0 -0.707107
+vt -0.0942809 0.0166667
+vt -0.0942809 0
+vt -0.0707107 0
+f 7/14/6 4/15/6 3/16/6 8/17/6 
+
+g Mesh2 Group3 Group1 Model
+
+v 7 54.625 -51
+vn 0 3.33067e-16 -1
+v 7 55.625 -51
+v 15 55.625 -51
+v 15 54.625 -51
+f 9/1/7 10/2/7 11/3/7 12/4/7 
+
+vn -0.707107 -2.35514e-16 0.707107
+v 8 54.625 -50
+v 8 55.625 -50
+f 9/1/8 13/5/8 14/6/8 10/2/8 
+
+v 14 54.625 -50
+vn 0 -1 -3.33067e-16
+f 15/7/9 13/8/9 9/2/9 12/3/9 
+
+v 14 55.625 -50
+vn 0 -3.33067e-16 1
+f 16/9/10 14/10/10 13/11/10 15/12/10 
+
+vn 0 1 3.33067e-16
+f 11/13/11 10/2/11 14/11/11 16/12/11 
+
+vn 0.707107 -2.35514e-16 0.707107
+f 15/14/12 12/15/12 11/16/12 16/17/12 
+
+g Mesh3 Group4 Group1 Model
+
+vn 1 -1.16573e-15 -0
+v 15 54.625 -1
+v 15 54.625 -51
+vt -0.833333 0.0166667
+vt -0.833333 0
+f 4/2/13 17/1/13 18/18/13 11/19/13 
+
+v 14 54.625 -2
+vt 0.0235702 0.0166667
+vn -0.707107 8.24299e-16 0.707107
+vt 0.0235702 0
+f 19/20/14 17/1/14 4/2/14 7/21/14 
+
+vn -1.16573e-15 -1 -0
+v 14 54.625 -50
+vt 0.0166667 0.816667
+vt 0 0.833333
+f 19/8/15 20/22/15 18/23/15 17/2/15 
+
+vt 0.0166667 0
+vn -1 1.16573e-15 -0
+vt 0.816667 0
+vt 0.816667 0.0166667
+f 7/24/16 16/25/16 20/26/16 19/8/16 
+
+vt -0.0166667 0.816667
+vn 1.16573e-15 1 -0
+f 16/27/17 7/11/17 4/2/17 11/23/17 
+
+vt 0.589256 0.0166667
+vn -0.707107 8.24299e-16 -0.707107
+vt 0.565685 0.0166667
+vt 0.565685 0
+vt 0.589256 0
+f 18/28/18 20/29/18 16/30/18 11/31/18 
+
+g Mesh4 Group5 Group1 Model
+
+vn -1 0 -0
+f 2/2/19 1/1/19 10/18/19 9/19/19 
+
+vn 0.707107 0 0.707107
+f 5/20/20 1/1/20 2/2/20 6/21/20 
+
+f 5/8/3 14/22/3 10/23/3 1/2/3 
+
+vn 1 0 -0
+f 6/24/21 13/25/21 14/26/21 5/8/21 
+
+f 13/27/5 6/11/5 2/2/5 9/23/5 
+
+f 10/28/6 14/29/6 13/30/6 9/31/6 
+
+g Mesh5 Group7 Group6 Model
+
+v 1 -0.375 -1
+v 1 0.625 -1
+v 1 0.625 -51
+v 1 -0.375 -51
+f 21/2/19 22/1/19 23/18/19 24/19/19 
+
+v 2 0.625 -2
+v 2 -0.375 -2
+f 25/20/20 22/1/20 21/2/20 26/21/20 
+
+v 2 0.625 -50
+f 25/8/3 27/22/3 23/23/3 22/2/3 
+
+v 2 -0.375 -50
+f 26/24/21 28/25/21 27/26/21 25/8/21 
+
+f 28/27/5 26/11/5 21/2/5 24/23/5 
+
+f 23/28/6 27/29/6 28/30/6 24/31/6 
+
+g Mesh6 Group8 Group6 Model
+
+v 21 0.625 -1
+v 21 -0.375 -1
+v 21 -0.375 -51
+v 21 0.625 -51
+f 29/2/13 30/1/13 31/18/13 32/19/13 
+
+v 20 -0.375 -2
+v 20 0.625 -2
+f 33/20/14 30/1/14 29/2/14 34/21/14 
+
+v 20 -0.375 -50
+f 33/8/15 35/22/15 31/23/15 30/2/15 
+
+v 20 0.625 -50
+f 34/24/16 36/25/16 35/26/16 33/8/16 
+
+f 36/27/17 34/11/17 29/2/17 32/23/17 
+
+f 31/28/18 35/29/18 36/30/18 32/31/18 
+
+g Mesh7 Group6 Model
+
+v 20 0.625 -50
+vt 0.316667 0.0166667
+v 2 0.625 -50
+v 2 -0.375 -50
+vt 0.0166667 1.85037e-18
+v 20 -0.375 -50
+vt 0.316667 1.85037e-18
+f 37/32/1 38/8/1 39/33/1 40/34/1 
+
+vt 0.333333 0.833333
+vt 0.316667 0.816667
+f 32/35/3 23/23/3 38/22/3 37/36/3 
+
+v 21 -0.375 -51
+vt -0.333333 1.85037e-18
+vn -1.42109e-15 0 -1
+v 1 -0.375 -51
+vt -1.18424e-15 1.85037e-18
+vt -1.18424e-15 0.0166667
+vt -0.333333 0.0166667
+f 41/37/22 42/38/22 23/39/22 32/40/22 
+
+vt -0.333333 0.833333
+vt -0.316667 0.816667
+f 41/41/5 40/42/5 39/27/5 42/23/5 
+
+vt 0.801388 1.85037e-18
+vt 0.824958 1.85037e-18
+vt 0.824958 0.0166667
+vt 0.801388 0.0166667
+f 40/43/20 41/44/20 32/45/20 37/46/20 
+
+vt -0.565685 0.0166667
+vn -0.707107 0 0.707107
+vt -0.589256 0.0166667
+vt -0.589256 1.85037e-18
+vt -0.565685 1.85037e-18
+f 38/47/23 23/48/23 42/49/23 39/50/23 
+
+g Mesh8 Group6 Model
+
+v 21 -0.375 -1
+vt 0.333333 0
+v 21 0.625 -1
+vt 0.333333 0.0166667
+f 21/2/1 43/51/1 44/52/1 22/1/1 
+
+v 20 -0.375 -2
+vt -0.316667 0.0166667
+vt -0.333333 0
+f 21/2/5 26/11/5 45/53/5 43/54/5 
+
+f 26/6/2 21/2/2 22/1/2 25/5/2 
+
+v 20 0.625 -2
+f 22/2/3 44/51/3 46/32/3 25/8/3 
+
+vt -0.212132 0.0166667
+vt -0.235702 0.0166667
+vt -0.235702 0
+vt -0.212132 0
+f 46/55/6 44/56/6 43/57/6 45/58/6 
+
+vt -0.316667 0
+f 25/11/4 46/53/4 45/59/4 26/10/4 
+
+g Mesh9 Group9 Model
+
+v 14 0.625 -1
+v 15 0.625 -1
+vt 0.0166667 0.9
+v 14 54.625 -1
+vt 0 0.9
+f 47/2/1 48/24/1 3/60/1 49/61/1 
+
+v 14 0.625 -2
+v 15 0.625 -2
+f 47/2/5 50/1/5 51/11/5 48/10/5 
+
+vt -0.0166667 0.9
+f 50/10/19 47/2/19 49/61/19 8/62/19 
+
+v 15 54.625 -2
+f 8/1/3 49/2/3 3/24/3 52/8/3 
+
+f 48/2/21 51/24/21 52/60/21 3/61/21 
+
+f 51/10/4 50/2/4 8/61/4 52/62/4 
+
+g Mesh10 Group10 Model
+
+v 7 0.625 -1
+v 8 0.625 -1
+v 8 54.625 -1
+f 53/2/1 54/24/1 55/60/1 2/61/1 
+
+v 7 0.625 -2
+v 8 0.625 -2
+f 53/2/5 56/1/5 57/11/5 54/10/5 
+
+v 7 54.625 -2
+f 56/10/19 53/2/19 2/61/19 58/62/19 
+
+f 58/1/3 2/2/3 55/24/3 6/8/3 
+
+f 54/2/21 57/24/21 6/60/21 55/61/21 
+
+f 57/10/4 56/2/4 58/61/4 6/62/4 
+
+g Mesh11 Group11 Model
+
+v 14 0.625 -50
+v 15 0.625 -50
+v 15 54.625 -50
+f 59/2/1 60/24/1 61/60/1 15/61/1 
+
+v 14 0.625 -51
+v 15 0.625 -51
+f 59/2/5 62/1/5 63/11/5 60/10/5 
+
+v 14 54.625 -51
+f 62/10/19 59/2/19 15/61/19 64/62/19 
+
+f 64/1/3 15/2/3 61/24/3 12/8/3 
+
+f 60/2/21 63/24/21 12/60/21 61/61/21 
+
+f 63/10/4 62/2/4 64/61/4 12/62/4 
+
+g Mesh12 Group12 Model
+
+v 7 0.625 -50
+v 8 0.625 -50
+v 7 54.625 -50
+f 65/2/1 66/24/1 13/60/1 67/61/1 
+
+v 7 0.625 -51
+v 8 0.625 -51
+f 65/2/5 68/1/5 69/11/5 66/10/5 
+
+f 68/10/19 65/2/19 67/61/19 9/62/19 
+
+v 8 54.625 -51
+f 9/1/3 67/2/3 13/24/3 70/8/3 
+
+f 66/2/21 69/24/21 70/60/21 13/61/21 
+
+f 69/10/4 68/2/4 9/61/4 70/62/4 
+
+g Mesh13 Group13 Model
+
+v 1 44.625 -51
+vt 0.85 1.20792e-14
+vn 1 0 -1.62004e-11
+v 1 45.625 -51
+vt 0.85 0.0166667
+v 1 45.625 -1
+v 1 44.625 -1
+vt 0.0166667 1.20792e-14
+f 71/63/24 72/64/24 73/8/24 74/65/24 
+
+v 21 45.625 -51
+vt 0.35 0.0166667
+vn 1.42109e-15 0 1
+v 21 44.625 -51
+vt 0.35 1.20792e-14
+f 75/66/25 72/8/25 71/65/25 76/67/25 
+
+v 22 45.625 -52
+vt 0.366667 0.866667
+vn 2.22808e-14 1 -2.77112e-13
+v 8.52651e-14 45.625 -52
+vt 1.04974e-15 0.866667
+vt 0.0166667 0.85
+vt 0.35 0.85
+f 77/68/26 78/69/26 72/70/26 75/71/26 
+
+v 22 44.625 -52
+vt -0.366667 1.23161e-14
+vn -1.42109e-14 -1.42109e-14 -1
+v 0 44.625 -52
+vt -1.23161e-14 2.72375e-14
+vt -1.37372e-14 0.0166667
+vt -0.366667 0.0166667
+f 79/72/27 80/73/27 78/74/27 77/75/27 
+
+vt -0.0166667 0.85
+vn -1.74789e-14 -1 4.16216e-15
+vt 2.60809e-28 0.866667
+vt -0.366667 0.866667
+f 71/76/28 80/77/28 79/78/28
+
+v 9.23706e-13 44.625 -0
+vt -1.53951e-14 -5.02757e-29
+f 80/77/28 71/76/28 81/79/28
+
+f 74/11/28 81/79/28 71/76/28
+
+v 22 44.625 -0
+vt -0.366667 -7.69507e-29
+f 81/79/28 74/11/28 82/80/28
+
+v 21 44.625 -1
+vt -0.35 0.0166667
+f 82/80/28 74/11/28 83/81/28
+
+vn 3.66259e-13 -9.4739e-15 -1
+v 21 45.625 -1
+vt -0.35 1.22371e-14
+vt -0.0166667 1.22371e-14
+f 73/11/29 84/81/29 83/82/29 74/83/29 
+
+v 9.23706e-13 45.625 -0
+vt 1.53951e-14 0
+v 22 45.625 -0
+vt 0.366667 0
+f 85/84/3 86/85/3 84/66/3 73/8/3 
+
+vt 0.366667 1.20792e-14
+vt 0.366667 0.0166667
+vt 1.53951e-14 0.0166667
+vt 1.53951e-14 1.20792e-14
+f 82/86/1 86/87/1 85/88/1 81/89/1 
+
+vt 0 1.20792e-14
+vt 0.866667 0
+vt 0.866667 0.0166667
+f 86/1/21 82/90/21 79/91/21 77/92/21 
+
+vt -0.35 0.85
+f 82/80/28 76/93/28 79/78/28
+
+f 82/80/28 83/81/28 76/93/28
+
+vn -1 4.26326e-14 -8.52651e-16
+vt -0.85 0.0166667
+vt -0.85 2.70006e-14
+vt -0.0166667 2.70006e-14
+f 84/11/30 75/94/30 76/95/30 83/96/30 
+
+vt 0.366667 -1.20699e-16
+vn 3.62377e-13 1 -7.24197e-15
+f 86/97/31 77/68/31 75/71/31 84/66/31 
+
+f 71/76/28 79/78/28 76/93/28
+
+vt -0.866667 0.0166667
+vn -1 2.84217e-14 1.71034e-14
+vt -0.866667 1.49214e-14
+vt 2.63308e-28 1.20792e-14
+vt 2.63308e-28 0.0166667
+f 78/98/32 80/99/32 81/100/32 85/101/32 
+
+vn 8.52651e-14 1 1.70399e-15
+vt 1.14883e-24 0.866667
+vt 1.3974e-14 2.83999e-17
+f 73/8/33 72/70/33 78/102/33 85/103/33 
+
+g Mesh14 Model
+
+vt -0.116667 0.85
+v 15 55.625 -51
+vt -0.25 0.85
+v 15 55.625 -1
+vt -0.25 0.0166667
+f 1/12/5 10/104/5 87/105/5 88/106/5 
+
+usemtl Wood_Bamboo
+vt -2.125 2.31771
+vt -0.0416667 2.31771
+v 7 56 -1
+vt -0.0416667 2.33333
+v 7 56 -51
+vt -2.125 2.33333
+f 10/107/19 1/108/19 89/109/19 90/110/19 
+
+vt 0.291667 2.31771
+vt 0.625 2.31771
+v 15 56 -1
+vt 0.625 2.33333
+vt 0.291667 2.33333
+f 1/111/1 88/112/1 91/113/1 89/114/1 
+
+vt 0.0416667 2.31771
+vt 2.125 2.31771
+v 15 56 -51
+vt 2.125 2.33333
+vt 0.0416667 2.33333
+f 88/115/21 87/116/21 92/117/21 91/118/21 
+
+vt -0.625 2.31771
+vt -0.291667 2.31771
+vt -0.291667 2.33333
+vt -0.625 2.33333
+f 87/119/4 10/120/4 90/121/4 92/122/4 
+
+vt 0.291667 2.125
+vt 0.291667 0.0416667
+vt 0.625 0.0416667
+vt 0.625 2.125
+f 90/123/3 89/124/3 91/125/3 92/126/3 
+
+`,
+};
+
+/* ============================================================
+   READ URL PARAM
+============================================================ */
+const params  = new URLSearchParams(location.search);
+const code    = params.get('code') || PRODUCTS[0].code;
+const product = PRODUCTS.find(p => p.code === code) || PRODUCTS[0];
+
+/* ============================================================
+   RENDER PRODUCT INFO
+============================================================ */
+function renderProduct() {
+  const el = document.getElementById('product-info');
+  document.title = product.name + ' — Pieces Furniture';
+
+  el.innerHTML = `
+    <div class="product-tag">Code ${product.code}</div>
+    <h1 class="product-name">${product.name.replace(' ', '<em>').replace(/( .*)$/, '</em>$1')}</h1>
+
+    <div class="product-price-row">
+      <div class="product-price" id="price-display">${product.salePrice || product.price}</div>
+      ${product.salePrice ? `<div class="product-price-orig">${product.price}</div><div class="product-sale-badge">${product.discount}</div>` : ''}
+    </div>
+    <div id="gold-notice" style="display:none;font-family:'Barlow Condensed',sans-serif;font-size:.78rem;color:#c9a84c;letter-spacing:.05em;margin-top:-.3rem">✨ Gold powder coat: +2,500 Ks added</div>
+
+    <p class="product-desc">${product.description || 'Premium steel furniture crafted to order. Custom sizes and finishes available.'}</p>
+
+    <div>
+      <div class="specs-title">Specifications</div>
+      <table class="specs-table">
+        ${product.dims      ? `<tr><td>Dimensions</td><td>${product.dims}</td></tr>` : ''}
+        ${product.material  ? `<tr><td>Material</td><td>${product.material}</td></tr>` : ''}
+        ${product.weight    ? `<tr><td>Weight</td><td>${product.weight}</td></tr>` : ''}
+        ${product.assembly  ? `<tr><td>Assembly</td><td>${product.assembly}</td></tr>` : ''}
+        <tr><td>Paint</td><td>Powder Coat</td></tr>
+        <tr><td>Custom Sizes</td><td>Available on request</td></tr>
+      </table>
+    </div>
+
+    ${product.howToUse ? `
+    <div class="order-divider"></div>
+    <div class="order-title">💡 How to Use</div>
+    <p class="product-desc" style="white-space:pre-line">${product.howToUse}</p>
+    ` : ''}
+
+    ${product.delivery ? `
+    <div class="order-divider"></div>
+    <div class="order-title">📅 Delivery & Order Info</div>
+    <p class="product-desc" style="white-space:pre-line">${product.delivery}</p>
+    ` : ''}
+
+    <div class="order-divider"></div>
+    <div class="order-title">🛒 Add to Cart</div>
+
+    <div class="order-row">
+      <div class="of"><label>Width (လက်မ / ပေ)</label><input type="text" class="fi" id="o-width" placeholder="e.g. 60 လက်မ"/></div>
+      <div class="of"><label>Height (လက်မ / ပေ)</label><input type="text" class="fi" id="o-height" placeholder="e.g. 84 လက်မ"/></div>
+    </div>
+
+    <div class="of">
+      <label>Color</label>
+      <div class="swatches">
+        <div class="sw on"  data-color="Black"  data-label="Black"  style="background:#111;border-color:#555" onclick="pickColor(this)"></div>
+        <div class="sw"     data-color="White"  data-label="White"  style="background:#f0f0f0"               onclick="pickColor(this)"></div>
+        <div class="sw"     data-color="Gold"   data-label="Gold"   style="background:#c9a84c"               onclick="pickColor(this)"></div>
+        <div class="sw"     data-color="Purple" data-label="Purple" style="background:#7c41b6"               onclick="pickColor(this)"></div>
+        <div class="sw"     data-color="Pink"   data-label="Pink"   style="background:#e91e8c"               onclick="pickColor(this)"></div>
+      </div>
+    </div>
+
+    <div class="of">
+      <label>Quantity</label>
+      <div class="qty-row">
+        <button class="qty-btn" onclick="changeQty(-1)">−</button>
+        <input type="number" class="fi qty-input" id="o-qty" value="1" min="1" max="99" readonly/>
+        <button class="qty-btn" onclick="changeQty(1)">+</button>
+      </div>
+    </div>
+
+    <div class="of"><label>Note / Special Request</label><input type="text" class="fi" id="o-note" placeholder="e.g. specific finish, delivery notes…"/></div>
+
+    <button class="btn-order btn-addcart" onclick="addToCart()">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+      Add to Cart
+    </button>
+
+    <div id="cart-toast" style="display:none;margin-top:.8rem;padding:.7rem 1rem;background:rgba(0,200,100,.15);border:1px solid rgba(0,200,100,.3);border-radius:8px;font-family:'Barlow Condensed',sans-serif;font-size:.85rem;color:#4dffaa;text-align:center"></div>
+  `;
+}
+
+
+function pickColor(el) {
+  document.querySelectorAll('.sw').forEach(s => s.classList.remove('on'));
+  el.classList.add('on');
+}
+
+function changeQty(delta) {
+  const input = document.getElementById('o-qty');
+  if (!input) return;
+  const val = Math.min(99, Math.max(1, parseInt(input.value) + delta));
+  input.value = val;
+}
+
+function addToCart() {
+  const color  = document.querySelector('.sw.on')?.dataset.color || 'Black';
+  const qty    = parseInt(document.getElementById('o-qty')?.value || 1);
+  const width  = document.getElementById('o-width')?.value.trim();
+  const height = document.getElementById('o-height')?.value.trim();
+  const note   = document.getElementById('o-note')?.value.trim();
+  const colorAdd = color === 'Gold' ? 2500 : 0;
+  const basePrice = parseInt((product.salePrice || product.price).replace(/[^0-9]/g,''));
+
+  const item = {
+    uid:      Date.now(),
+    code:     product.code,
+    name:     product.name,
+    price:    product.salePrice || product.price,
+    unitPrice: basePrice + colorAdd,
+    color, qty, width, height, note,
+    paint:    'Powder Coat',
+  };
+
+  const cart = JSON.parse(localStorage.getItem('pieces_cart') || '[]');
+  cart.push(item);
+  localStorage.setItem('pieces_cart', JSON.stringify(cart));
+
+  // Show success toast
+  const toast = document.getElementById('cart-toast');
+  toast.textContent = `✅ ${product.name} (${color} × ${qty}) added to cart!`;
+  toast.style.display = 'block';
+  setTimeout(() => toast.style.display = 'none', 3000);
+
+  // Reset qty
+  const qtyEl = document.getElementById('o-qty');
+  if (qtyEl) qtyEl.value = 1;
+}
+
+function getOrderDetails() {
+  const name  = document.getElementById('o-name')?.value.trim();
+  const phone = document.getElementById('o-phone')?.value.trim();
+  if (!name)  { showToast('⚠️ Please enter your name'); return null; }
+  if (!phone) { showToast('⚠️ Please enter your phone number'); return null; }
+  return {
+    name, phone,
+    width:  document.getElementById('o-width')?.value.trim(),
+    height: document.getElementById('o-height')?.value.trim(),
+    color:  document.querySelector('.sw.on')?.dataset.color || 'Black',
+    loc:    document.getElementById('o-loc')?.value.trim(),
+    note:   document.getElementById('o-note')?.value.trim(),
+  };
+}
+
+function buildMsg(d) {
+  let msg = `🛒 NEW ORDER — Pieces Furniture In Steel\n\n`;
+  msg += `Customer : ${d.name}\nPhone    : ${d.phone}\n`;
+  if (d.loc)    msg += `Location : ${d.loc}\n`;
+  msg += `\n─────────────────\n`;
+  msg += `\nProduct : ${product.name} (Code ${product.code})`;
+  msg += `\nPrice   : ${product.salePrice || product.price}`;
+  if (d.width)  msg += `\nWidth   : ${d.width}`;
+  if (d.height) msg += `\nHeight  : ${d.height}`;
+  msg += `\nColor   : ${d.color}\nPaint   : Powder Coat`;
+  if (d.note)   msg += `\nNote    : ${d.note}`;
+  msg += `\n\n─────────────────\nPlease confirm availability. Thank you!`;
+  return msg;
+}
+
+/* Confirm inside website chat — also saves order to localStorage so admin panel receives it */
+function confirmOrder() {
+  const d = getOrderDetails();
+  if (!d) return;
+
+  /* ── Save order to localStorage (read by admin.html as 'pieces_orders') ── */
+  const existing = JSON.parse(localStorage.getItem('pieces_orders') || '[]');
+  const newOrder = {
+    id:        Date.now(),
+    date:      new Date().toISOString(),
+    name:      d.name,
+    phone:     d.phone,
+    location:  d.loc  || '',
+    note:      d.note || '',
+    product:   product.name,
+    code:      product.code,
+    price:     product.salePrice || product.price,
+    width:     d.width  || '',
+    height:    d.height || '',
+    color:     d.color,
+    source:    'website',
+    status:    'New'
+  };
+  existing.unshift(newOrder);
+  localStorage.setItem('pieces_orders', JSON.stringify(existing));
+
+  /* ── Show in-page chat confirmation ── */
+  openChat();
+  addBubble('user order',
+    `🛒 <strong>Order Confirmed!</strong><br>
+    <strong>${product.name}</strong> — ${product.salePrice || product.price}<br>
+    ${d.width  ? `W: ${d.width} · ` : ''}${d.height ? `H: ${d.height} · ` : ''}
+    Color: ${d.color} · Powder Coat
+    ${d.note ? `<br>📝 ${d.note}` : ''}`,
+    d.name
+  );
+  setTimeout(() => addBubble('bot',
+    `✅ Thank you <strong>${d.name}</strong>! Your order for <strong>${product.name}</strong> has been received.<br>We will contact you at <strong>${d.phone}</strong> to confirm availability shortly. 🙏`,
+    'Pieces Support'
+  ), 800);
+}
+
+/* Send via Messenger */
+function sendViaMessenger() {
+  const d = getOrderDetails();
+  if (!d) return;
+  window.open(`https://m.me/100077773069317?text=${encodeURIComponent(buildMsg(d))}`, '_blank');
+  showToast('✅ Opening Messenger…');
+}
+
+/* Send via Telegram */
+function sendViaTelegram() {
+  const d = getOrderDetails();
+  if (!d) return;
+  window.open(`https://t.me/PIECESFURNITURE?text=${encodeURIComponent(buildMsg(d))}`, '_blank');
+  showToast('✅ Opening Telegram…');
+}
+
+/* ============================================================
+   CHAT WIDGET
+============================================================= */
+function openChat() {
+  document.getElementById('chat-win').classList.add('open');
+  document.getElementById('chat-dot').style.display = 'none';
+}
+
+function toggleChat() {
+  document.getElementById('chat-win').classList.toggle('open');
+  document.getElementById('chat-dot').style.display = 'none';
+}
+
+function sendMsg() {
+  const input = document.getElementById('chat-ti');
+  const text  = input.value.trim();
+  if (!text) return;
+  addBubble('user', text, 'You');
+  input.value = '';
+  setTimeout(() => addBubble('bot',
+    "Thanks for your message! We'll reply shortly. For faster help, contact us on Messenger or Telegram.",
+    'Pieces Support'
+  ), 1000);
+}
+
+function addBubble(type, html, meta) {
+  const msgs = document.getElementById('chat-msgs');
+  const div  = document.createElement('div');
+  div.className = `cm ${type}`;
+  div.innerHTML = `<div class="bub">${html}</div><div class="bub-meta">${meta}</div>`;
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+/* ============================================================
+   RELATED PRODUCTS
+============================================================ */
+function renderRelated() {
+  const others = PRODUCTS.filter(p => p.code !== product.code).slice(0, 6);
+  const grid = document.getElementById('related-grid');
+  const ph = `this.parentElement.innerHTML='<div class=\'no-img\'><svg width=\'30\' height=\'30\' viewBox=\'0 0 36 36\' fill=\'none\'><path d=\'M5 10h26M5 18h18M5 26h20\' stroke=\'#3a5070\' stroke-width=\'2.5\' stroke-linecap=\'round\'/></svg></div>'`;
+  grid.innerHTML = others.map(p => `
+    <div class="related-card" onclick="location.href='product.html?code=${p.code}'">
+      <div class="related-img"><img src="${p.image}" alt="${p.name}" onerror="${ph}" loading="lazy"/></div>
+      <div class="related-info">
+        <div class="related-code">Code ${p.code}</div>
+        <div class="related-name">${p.name}</div>
+        <div class="related-price">${p.salePrice || p.price}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+/* ============================================================
+   3D VIEWER — Three.js via CDN
+============================================================ */
+let scene, camera, renderer, mesh;
+let isSpinning = true;
+let isDragging = false;
+let prevMouse  = {x:0, y:0};
+let rotX = 0.3, rotY = 0;
+
+async function init3D() {
+  const canvas = document.getElementById('viewer3d');
+  const wrap   = canvas.parentElement;
+
+  // Load Three.js
+  await loadScript('https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js');
+
+  scene    = new THREE.Scene();
+  scene.background = new THREE.Color(0x0d1b2a);
+
+  const w  = wrap.clientWidth;
+  const h  = wrap.clientHeight;
+  camera   = new THREE.PerspectiveCamera(45, w/h, 0.1, 10000);
+  renderer = new THREE.WebGLRenderer({ canvas, antialias:true });
+  renderer.setSize(w, h);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+  // Full uniform lighting from all directions — no shadows, no hot spots
+  scene.add(new THREE.AmbientLight(0xffffff, 2.5));
+  const positions = [[1,1,1],[-1,1,1],[1,-1,1],[-1,-1,1],[1,1,-1],[-1,1,-1]];
+  positions.forEach(([x,y,z]) => {
+    const d = new THREE.DirectionalLight(0xffffff, 0.6);
+    d.position.set(x*100, y*100, z*100);
+    scene.add(d);
+  });
+
+  // Parse OBJ
+  const objText = OBJ_DATA[product.model] || '';
+  if (objText) {
+    mesh = parseOBJ(objText);
+    scene.add(mesh);
+    // Centre and fit
+    const box    = new THREE.Box3().setFromObject(mesh);
+    const centre = box.getCenter(new THREE.Vector3());
+    const size   = box.getSize(new THREE.Vector3());
+    const maxDim = Math.max(size.x, size.y, size.z);
+    mesh.position.sub(centre);
+    const dist   = maxDim * 1.8;
+    camera.position.set(0, 0, dist);
+    camera.lookAt(0, 0, 0);
+  } else {
+    // No OBJ — show a placeholder steel box
+    const geo  = new THREE.BoxGeometry(40, 60, 20);
+    const mat  = new THREE.MeshBasicMaterial({ color:0xc0c0c0, side: THREE.DoubleSide });
+    mesh = new THREE.Mesh(geo, mat);
+    scene.add(mesh);
+    camera.position.set(0, 0, 140);
+    camera.lookAt(0, 0, 0);
+  }
+
+  // Hide loading
+  document.getElementById('viewer-loading').classList.add('done');
+  // Apply default color
+  set3DColor('Black');
+
+  // Events
+  canvas.addEventListener('mousedown',  e => { isDragging=true; prevMouse={x:e.clientX, y:e.clientY}; });
+  canvas.addEventListener('mousemove',  onMouseMove);
+  canvas.addEventListener('mouseup',   () => isDragging=false);
+  canvas.addEventListener('mouseleave',() => isDragging=false);
+  canvas.addEventListener('wheel',     onWheel, {passive:true});
+  canvas.addEventListener('touchstart', e => { isDragging=true; prevMouse={x:e.touches[0].clientX, y:e.touches[0].clientY}; }, {passive:true});
+  canvas.addEventListener('touchmove',  e => { onMouseMove({clientX:e.touches[0].clientX, clientY:e.touches[0].clientY}); e.preventDefault(); }, {passive:false});
+  canvas.addEventListener('touchend',  () => isDragging=false);
+
+  window.addEventListener('resize', () => {
+    const w2 = wrap.clientWidth, h2 = wrap.clientHeight;
+    camera.aspect = w2/h2; camera.updateProjectionMatrix();
+    renderer.setSize(w2, h2);
+  });
+
+  animate();
+}
+
+function onMouseMove(e) {
+  if (!isDragging || !mesh) return;
+  const dx = e.clientX - prevMouse.x;
+  const dy = e.clientY - prevMouse.y;
+  rotY += dx * 0.008;
+  rotX += dy * 0.008;
+  prevMouse = {x:e.clientX, y:e.clientY};
+}
+
+function onWheel(e) {
+  camera.position.z += e.deltaY * 0.5;
+  camera.position.z  = Math.max(20, Math.min(camera.position.z, 2000));
+}
+
+function animate() {
+  requestAnimationFrame(animate);
+  if (mesh) {
+    if (isSpinning && !isDragging) rotY += 0.004;
+    mesh.rotation.x = rotX;
+    mesh.rotation.y = rotY;
+  }
+  renderer.render(scene, camera);
+}
+
+function resetCamera() {
+  rotX = 0.3; rotY = 0;
+  if (camera) { camera.position.z = camera.position.z; }
+}
+
+function toggleSpin() {
+  isSpinning = !isSpinning;
+  document.getElementById('spin-toggle').classList.toggle('off', !isSpinning);
+}
+
+/* Simple OBJ parser */
+function parseOBJ(text) {
+  const vertices=[], normals=[], positions=[], norms=[];
+  text.split('\n').forEach(line => {
+    const p = line.trim().split(/\s+/);
+    if (p[0]==='v')  vertices.push(new THREE.Vector3(+p[1],+p[2],+p[3]));
+    if (p[0]==='vn') normals.push(new THREE.Vector3(+p[1],+p[2],+p[3]));
+    if (p[0]==='f') {
+      const pts = p.slice(1).map(s => s.split('/'));
+      // Triangulate polygon
+      for (let i=1; i<pts.length-1; i++) {
+        [0,i,i+1].forEach(idx => {
+          const vi = +pts[idx][0]-1;
+          const ni = pts[idx][2] ? +pts[idx][2]-1 : -1;
+          if (vertices[vi]) { positions.push(vertices[vi].x, vertices[vi].y, vertices[vi].z); }
+          if (ni>=0 && normals[ni]) { norms.push(normals[ni].x, normals[ni].y, normals[ni].z); }
+          else { norms.push(0,1,0); }
+        });
+      }
+    }
+  });
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+  geo.setAttribute('normal',   new THREE.Float32BufferAttribute(norms, 3));
+  geo.computeBoundingSphere();
+  const mat = new THREE.MeshBasicMaterial({
+    color:    0x0a0a0a,
+    side:     THREE.DoubleSide,
+  });
+  return new THREE.Mesh(geo, mat);
+}
+
+/* ── 3D Color switcher ── */
+const COLOR_3D = {
+  Black: { hex: 0x0a0a0a, priceAdd: 0 },
+  White: { hex: 0xeeeeee, priceAdd: 0 },
+  Gold:  { hex: 0xc9a84c, priceAdd: 2500 },
+};
+let current3DColor = 'Black';
+
+function set3DColor(colorName) {
+  current3DColor = colorName;
+  const c = COLOR_3D[colorName];
+
+  if (mesh) {
+    const newMat = new THREE.MeshBasicMaterial({
+      color: c.hex,
+      side:  THREE.DoubleSide,
+    });
+    mesh.traverse(child => {
+      if (child.isMesh) {
+        if (Array.isArray(child.material)) {
+          child.material.forEach(m => m.dispose());
+          child.material = child.material.map(() => newMat.clone());
+        } else {
+          child.material.dispose();
+          child.material = newMat.clone();
+        }
+      }
+    });
+    newMat.dispose();
+  }
+  // Update color buttons UI
+  document.querySelectorAll('.color3d-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.color === colorName);
+  });
+  // Update price display
+  const basePrice = parseInt((product.salePrice || product.price).replace(/[^0-9]/g, ''));
+  const total = basePrice + c.priceAdd;
+  const formatted = total.toLocaleString() + ' Ks';
+  document.getElementById('price-display').textContent = formatted;
+  document.getElementById('gold-notice').style.display = c.priceAdd > 0 ? 'block' : 'none';
+}
+
+function loadScript(src) {
+  return new Promise((res,rej) => {
+    const s = document.createElement('script');
+    s.src = src; s.onload = res; s.onerror = rej;
+    document.head.appendChild(s);
+  });
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+/* ============================================================
+   INIT
+============================================================ */
+renderProduct();
+renderRelated();
+renderPhotos();
+init3D();
+
+/* ── CART FUNCTIONS ── */
+function openCart() {
+  const cart = JSON.parse(localStorage.getItem('pieces_cart') || '[]');
+  updateCartUI(cart);
+  document.getElementById('cart-drawer').style.right = '0';
+  document.getElementById('cart-veil').style.display = 'block';
+}
+function closeCart() {
+  document.getElementById('cart-drawer').style.right = '-420px';
+  document.getElementById('cart-veil').style.display = 'none';
+}
+function clearCart() {
+  localStorage.setItem('pieces_cart', '[]');
+  updateCartUI([]);
+}
+function removeCartItem(uid) {
+  const cart = JSON.parse(localStorage.getItem('pieces_cart') || '[]').filter(i => i.uid !== uid);
+  localStorage.setItem('pieces_cart', JSON.stringify(cart));
+  updateCartUI(cart);
+}
+function updateCartUI(cart) {
+  const badge    = document.getElementById('cart-badge');
+  const bd       = document.getElementById('cart-bd');
+  const ft       = document.getElementById('cart-ft');
+  const total    = document.getElementById('cart-total');
+  const grand    = document.getElementById('cart-grand-total');
+  const count    = cart.reduce((s,i) => s+(i.qty||1), 0);
+  badge.textContent = count;
+  badge.style.display = count ? 'flex' : 'none';
+  if (!cart.length) {
+    bd.innerHTML = '<div style="text-align:center;color:#7a8fa6;padding:3rem 0;font-size:.9rem">🛒<br><br>No items yet.<br>Add products to cart!</div>';
+    ft.style.display = 'none';
+    return;
+  }
+  ft.style.display = 'flex';
+  let grandTotal = 0;
+  cart.forEach(i => { grandTotal += (i.unitPrice || parseInt((i.price||'0').replace(/[^0-9]/g,''))) * (i.qty||1); });
+  total.textContent = count + ' item' + (count>1?'s':'');
+  grand.textContent = grandTotal.toLocaleString() + ' Ks';
+  bd.innerHTML = cart.map(item => {
+    const u = item.unitPrice || parseInt((item.price||'0').replace(/[^0-9]/g,''));
+    const q = item.qty || 1;
+    return `<div style="display:flex;justify-content:space-between;align-items:flex-start;padding:.75rem 0;border-bottom:1px solid rgba(45,140,255,.08)">
+      <div style="flex:1">
+        <div style="font-family:'Cormorant Garamond',serif;font-size:.95rem;color:#f0f4ff">${item.name} ${q>1?`<span style="color:#7ec8ff">× ${q}</span>`:''}</div>
+        <div style="font-size:.72rem;color:#7a8fa6;margin-top:.2rem">
+          Code ${item.code}${item.color?' · '+item.color:''}${item.width?' · W:'+item.width:''}${item.height?' · H:'+item.height:''}
+        </div>
+        ${item.note?`<div style="font-size:.72rem;color:#7a8fa6">📝 ${item.note}</div>`:''}
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:.85rem;color:#7ec8ff;margin-top:.2rem">${(u*q).toLocaleString()} Ks</div>
+      </div>
+      <button onclick="removeCartItem(${item.uid})" style="background:none;border:none;color:#7a8fa6;cursor:pointer;font-size:.9rem;padding:.2rem .4rem">✕</button>
+    </div>`;
+  }).join('');
+}
+function buildOrderMsg() {
+  const cart     = JSON.parse(localStorage.getItem('pieces_cart') || '[]');
+  const name     = document.getElementById('cust-name').value.trim()     || 'Customer';
+  const phone    = document.getElementById('cust-phone').value.trim()    || 'Not provided';
+  const location = document.getElementById('cust-location').value.trim() || 'Not provided';
+  let msg = `🛒 NEW ORDER — Pieces Furniture\n\n👤 ${name}\n📞 ${phone}\n📍 ${location}\n\n`;
+  let grandTotal = 0;
+  cart.forEach((item,i) => {
+    const u = item.unitPrice || parseInt((item.price||'0').replace(/[^0-9]/g,''));
+    const q = item.qty || 1;
+    grandTotal += u * q;
+    msg += `${i+1}. ${item.name} (Code: ${item.code})\n`;
+    msg += `   Color: ${item.color||'—'} · Qty: ${q}\n`;
+    if (item.width||item.height) msg += `   Size: W${item.width||'?'} × H${item.height||'?'}\n`;
+    if (item.note) msg += `   Note: ${item.note}\n`;
+    msg += `   Subtotal: ${(u*q).toLocaleString()} Ks\n\n`;
+  });
+  msg += `💰 TOTAL: ${grandTotal.toLocaleString()} Ks`;
+  return msg;
+}
+function validateCart() {
+  const cart  = JSON.parse(localStorage.getItem('pieces_cart') || '[]');
+  const name  = document.getElementById('cust-name').value.trim();
+  const phone = document.getElementById('cust-phone').value.trim();
+  if (!cart.length) { alert('Your cart is empty!'); return false; }
+  if (!name)  { document.getElementById('cust-name').focus();  alert('Please enter your name.');         return false; }
+  if (!phone) { document.getElementById('cust-phone').focus(); alert('Please enter your phone number.'); return false; }
+  return true;
+}
+function sendViaMessenger() {
+  if (!validateCart()) return;
+  const msg = buildOrderMsg();
+  window.open('https://m.me/100077773069317?text=' + encodeURIComponent(msg), '_blank');
+  localStorage.setItem('pieces_cart', '[]');
+  closeCart();
+}
+function sendViaTelegram() {
+  if (!validateCart()) return;
+  const msg = buildOrderMsg();
+  window.open('https://t.me/PIECESFURNITURE?text=' + encodeURIComponent(msg), '_blank');
+  localStorage.setItem('pieces_cart', '[]');
+  closeCart();
+}
+
+/* Update badge on load */
+(function(){ const c=JSON.parse(localStorage.getItem('pieces_cart')||'[]'); const b=document.getElementById('cart-badge'); if(b){ b.textContent=c.reduce((s,i)=>s+(i.qty||1),0); b.style.display=b.textContent==='0'?'none':'flex'; } })();
+
+/* ── Photo thumbnails in viewer corner ── */
+function renderPhotos() {
+  const container = document.getElementById('viewer-photos');
+  if (!container) return;
+  const photos = [];
+  if (product.image)       photos.push(product.image);
+  if (product.extraImages) product.extraImages.filter(Boolean).forEach(p => photos.push(p));
+  if (photos.length === 0) return;
+  container.innerHTML = photos.map(src => `
+    <img class="viewer-thumb" src="${src}" alt="Photo"
+      onerror="this.style.display='none'"
+      onclick="openLightbox('${src}'); event.stopPropagation()"/>
+  `).join('');
+}
+
+function openLightbox(src) {
+  document.getElementById('lightbox-img').src = src;
+  document.getElementById('photo-lightbox').classList.add('open');
+}
+function closeLightbox() {
+  document.getElementById('photo-lightbox').classList.remove('open');
+}
+</script>
+</body>
+</html>
