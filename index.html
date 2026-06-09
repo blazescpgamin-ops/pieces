@@ -925,6 +925,49 @@ footer {
 .h-order-item span { color: var(--silver); }
 
 </style>
+
+<!-- ============================================================
+     FIREBASE — syncs data across all devices in real time
+============================================================ -->
+<script type="module">
+  import { initializeApp }                          from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getFirestore, collection, doc, setDoc,
+           getDocs, deleteDoc, onSnapshot, addDoc,
+           serverTimestamp, query, orderBy }        from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAvmgX10Ajm-m0FLo8ozgqU7i9NTYoPhvc",
+  authDomain: "dgtnsths.firebaseapp.com",
+  projectId: "dgtnsths",
+  storageBucket: "dgtnsths.firebasestorage.app",
+  messagingSenderId: "296911630030",
+  appId: "1:296911630030:web:9bbab054b967303ae1ea9f",
+  measurementId: "G-DNKQ03S37P"
+};
+
+
+  const app = initializeApp(firebaseConfig);
+  const db  = getFirestore(app);
+
+  // ── Make Firebase available globally ──
+  window._db              = db;
+  window._col             = collection;
+  window._doc             = doc;
+  window._setDoc          = setDoc;
+  window._getDocs         = getDocs;
+  window._deleteDoc       = deleteDoc;
+  window._onSnapshot      = onSnapshot;
+  window._addDoc          = addDoc;
+  window._serverTimestamp = serverTimestamp;
+  window._query           = query;
+  window._orderBy         = orderBy;
+
+  // Signal that Firebase is ready
+  window._firebaseReady = true;
+  document.dispatchEvent(new Event('firebase-ready'));
+</script>
+
 </head>
 <body>
 
@@ -1989,5 +2032,37 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 });
 </script>
+
+<script>
+/* ============================================================
+   FIREBASE ORDER SYNC
+   Orders placed on the website save to Firestore so admin
+   can see them from any device in real time.
+============================================================ */
+document.addEventListener('firebase-ready', function() {
+
+  // Override saveOrderToHistory to also write to Firestore
+  const _origSave = window.saveOrderToHistory;
+  window.saveOrderToHistory = async function(items, customer) {
+    // Still save locally as backup
+    if (_origSave) _origSave(items, customer);
+
+    // Save to Firestore
+    try {
+      await window._addDoc(window._col(window._db, 'orders'), {
+        customer:  customer,
+        items:     items,
+        date:      new Date().toLocaleString(),
+        createdAt: window._serverTimestamp(),
+      });
+      console.log('✅ Order saved to Firebase');
+    } catch(e) {
+      console.error('Firebase order save failed:', e);
+    }
+  };
+
+});
+</script>
+
 </body>
 </html>

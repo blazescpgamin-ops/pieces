@@ -339,6 +339,49 @@ canvas#viewer3d{width:100%;height:100%;display:block;border-radius:16px}
   .order-row{grid-template-columns:1fr}
 }
 </style>
+
+<!-- ============================================================
+     FIREBASE — syncs data across all devices in real time
+============================================================ -->
+<script type="module">
+  import { initializeApp }                          from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getFirestore, collection, doc, setDoc,
+           getDocs, deleteDoc, onSnapshot, addDoc,
+           serverTimestamp, query, orderBy }        from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAvmgX10Ajm-m0FLo8ozgqU7i9NTYoPhvc",
+  authDomain: "dgtnsths.firebaseapp.com",
+  projectId: "dgtnsths",
+  storageBucket: "dgtnsths.firebasestorage.app",
+  messagingSenderId: "296911630030",
+  appId: "1:296911630030:web:9bbab054b967303ae1ea9f",
+  measurementId: "G-DNKQ03S37P"
+};
+
+
+  const app = initializeApp(firebaseConfig);
+  const db  = getFirestore(app);
+
+  // ── Make Firebase available globally ──
+  window._db              = db;
+  window._col             = collection;
+  window._doc             = doc;
+  window._setDoc          = setDoc;
+  window._getDocs         = getDocs;
+  window._deleteDoc       = deleteDoc;
+  window._onSnapshot      = onSnapshot;
+  window._addDoc          = addDoc;
+  window._serverTimestamp = serverTimestamp;
+  window._query           = query;
+  window._orderBy         = orderBy;
+
+  // Signal that Firebase is ready
+  window._firebaseReady = true;
+  document.dispatchEvent(new Event('firebase-ready'));
+</script>
+
 </head>
 <body>
 
@@ -1635,5 +1678,27 @@ function closeLightbox() {
   document.getElementById('photo-lightbox').classList.remove('open');
 }
 </script>
+
+<script>
+/* ============================================================
+   FIREBASE PRODUCT SYNC — product.html
+   Loads latest product data from Firestore so detail page
+   always shows current prices and info.
+============================================================ */
+document.addEventListener('firebase-ready', async function() {
+  try {
+    const snap = await window._getDocs(window._col(window._db, 'config'));
+    snap.forEach(d => {
+      if (d.id === 'products' && d.data().list) {
+        // Update localStorage so PRODUCTS array picks up latest data
+        localStorage.setItem('pieces_products_admin', JSON.stringify(d.data().list));
+      }
+    });
+  } catch(e) {
+    console.error('Firebase product load (product page) failed:', e);
+  }
+});
+</script>
+
 </body>
 </html>

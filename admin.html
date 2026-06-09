@@ -415,6 +415,49 @@ tr:hover td { background: rgba(45,140,255,.04); }
   th, td { padding: .6rem .7rem; }
 }
 </style>
+
+<!-- ============================================================
+     FIREBASE — syncs data across all devices in real time
+============================================================ -->
+<script type="module">
+  import { initializeApp }                          from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getFirestore, collection, doc, setDoc,
+           getDocs, deleteDoc, onSnapshot, addDoc,
+           serverTimestamp, query, orderBy }        from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAvmgX10Ajm-m0FLo8ozgqU7i9NTYoPhvc",
+  authDomain: "dgtnsths.firebaseapp.com",
+  projectId: "dgtnsths",
+  storageBucket: "dgtnsths.firebasestorage.app",
+  messagingSenderId: "296911630030",
+  appId: "1:296911630030:web:9bbab054b967303ae1ea9f",
+  measurementId: "G-DNKQ03S37P"
+};
+
+
+  const app = initializeApp(firebaseConfig);
+  const db  = getFirestore(app);
+
+  // ── Make Firebase available globally ──
+  window._db              = db;
+  window._col             = collection;
+  window._doc             = doc;
+  window._setDoc          = setDoc;
+  window._getDocs         = getDocs;
+  window._deleteDoc       = deleteDoc;
+  window._onSnapshot      = onSnapshot;
+  window._addDoc          = addDoc;
+  window._serverTimestamp = serverTimestamp;
+  window._query           = query;
+  window._orderBy         = orderBy;
+
+  // Signal that Firebase is ready
+  window._firebaseReady = true;
+  document.dispatchEvent(new Event('firebase-ready'));
+</script>
+
 </head>
 <body>
 
@@ -1399,5 +1442,90 @@ function capitalize(s) {
 }
 
 </script>
+
+<script>
+/* ============================================================
+   FIREBASE ADMIN SYNC
+   Loads products and orders from Firestore so admin panel
+   works from any device (laptop, phone, tablet).
+============================================================ */
+document.addEventListener('firebase-ready', async function() {
+
+  // ── LOAD ORDERS from Firestore (real-time) ──
+  const ordersRef = window._col(window._db, 'orders');
+  window._onSnapshot(
+    window._query(ordersRef, window._orderBy('createdAt', 'desc')),
+    (snapshot) => {
+      // Merge Firestore orders with localStorage orders
+      const fbOrders = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+      const localOrders = JSON.parse(localStorage.getItem('pieces_orders') || '[]');
+
+      // Combine — Firebase first (most up to date), then local
+      const allOrders = [...fbOrders];
+      localOrders.forEach(lo => {
+        const exists = fbOrders.find(fo =>
+          fo.customer?.name === lo.customer?.name &&
+          fo.date === lo.date
+        );
+        if (!exists) allOrders.push(lo);
+      });
+
+      // Update localStorage with merged list
+      localStorage.setItem('pieces_orders', JSON.stringify(allOrders));
+
+      // Re-render if orders page is active
+      if (typeof renderOrders === 'function')    renderOrders();
+      if (typeof renderDashboard === 'function') renderDashboard();
+      if (typeof renderCustomers === 'function') renderCustomers();
+      if (typeof renderMessages === 'function')  renderMessages();
+
+      // Update badge
+      const badge = document.getElementById('orders-badge');
+      if (badge && allOrders.length) {
+        badge.style.display = 'inline-block';
+        badge.textContent   = allOrders.length;
+      }
+    }
+  );
+
+  // ── SAVE PRODUCTS to Firestore when admin edits ──
+  const _origSaveProducts = window.saveProducts;
+  window.saveProducts = async function() {
+    // Save locally
+    if (_origSaveProducts) _origSaveProducts();
+
+    // Sync to Firestore — store as single document
+    try {
+      await window._setDoc(
+        window._doc(window._db, 'config', 'products'),
+        { list: JSON.parse(localStorage.getItem('pieces_products_admin') || '[]'),
+          updatedAt: window._serverTimestamp() }
+      );
+      console.log('✅ Products synced to Firebase');
+    } catch(e) {
+      console.error('Firebase product save failed:', e);
+    }
+  };
+
+  // ── LOAD PRODUCTS from Firestore ──
+  try {
+    const snap = await window._getDocs(
+      window._col(window._db, 'config')
+    );
+    snap.forEach(d => {
+      if (d.id === 'products' && d.data().list) {
+        localStorage.setItem('pieces_products_admin', JSON.stringify(d.data().list));
+        if (typeof loadData        === 'function') loadData();
+        if (typeof renderProducts  === 'function') renderProducts();
+        if (typeof renderDashboard === 'function') renderDashboard();
+      }
+    });
+  } catch(e) {
+    console.error('Firebase product load failed:', e);
+  }
+
+});
+</script>
+
 </body>
 </html>
